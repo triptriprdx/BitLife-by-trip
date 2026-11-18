@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>JMR's BitLife — Local LLM Life Sim</title>
-  <meta name="description" content="A BitLife-style life simulator running entirely in your browser. Click to live a life; type free actions and a local Gemma model interprets them; Stable Diffusion paints your avatar and life events. No install." />
+  <title>Life Simulator</title>
+  <meta name="description" content="Create a character and experience a life simulation." />
 
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="JMR's BitLife — Local LLM Life Sim" />
-  <meta property="og:description" content="Play a BitLife-style life simulator in your browser. Deterministic engine, free-typed actions interpreted by a local Gemma model, Stable Diffusion avatars — no install." />
+  <meta property="og:title" content="Life Simulator" />
+  <meta property="og:description" content="Create a character and experience a life simulation." />
   <meta property="og:image" content="./assets/og.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -395,6 +395,97 @@
       .age-wrap { width:66px; }
       .ageup { width:62px; }
     }
+
+    /* Complete clean life-simulator presentation */
+    :root { --bg:#f5f6f7; --panel:#fff; --panel-alt:#f0f1f2; --border:#e2e4e7; --text:#242629; --text-muted:#85898f; --accent:#25a957; --accent-dim:#198b45; --shadow:0 1px 2px rgba(0,0,0,.045); }
+    html { background:#f5f6f7; }
+    body { background:#f5f6f7; color:#242629; font-size:15px; }
+    .app { width:100%; max-width:min(var(--ui-width,480px),100%); min-height:100dvh; background:#f5f6f7; }
+    button { border-radius:7px; border-color:#dfe2e5; background:#f5f6f7; color:#303338; box-shadow:none; }
+    button:hover:not(:disabled) { background:#e9ebed; border-color:#cfd3d7; }
+    button.primary { background:#27ad5b; border-color:#27ad5b; color:#fff; border-radius:7px; }
+    input,select,textarea { border-radius:6px; border:1px solid #d9dde1; background:#fff; min-height:40px; }
+    input:focus,select:focus,textarea:focus { border-color:#28a85a; box-shadow:0 0 0 2px rgba(40,168,90,.10); }
+    #overlay { background:#f5f6f7; padding:max(24px,env(safe-area-inset-top)) 15px max(24px,env(safe-area-inset-bottom)); justify-content:flex-start; }
+    #overlay h1 { width:100%; max-width:440px; text-align:left; color:#242629; font-size:27px; font-weight:800; letter-spacing:-.8px; margin:5px auto 4px; }
+    #overlay .tagline { width:100%; max-width:440px; text-align:left; color:#85898f; font-size:13px; margin:0 auto 18px; line-height:1.45; }
+    .card { width:100%; max-width:440px; padding:15px; margin:0 auto 10px; background:#fff; border:1px solid #e1e4e7; border-radius:8px; box-shadow:none; }
+    .card.sel { border-color:#27ad5b; box-shadow:inset 3px 0 #27ad5b; }
+    .card h3 { font-size:16px; font-weight:750; margin-bottom:3px; color:#282b2e; }
+    .card .hint { font-size:12px; line-height:1.4; color:#85898f; }
+    .field { margin:10px 0 4px; }
+    .field label { color:#676c72; font-size:12px; font-weight:650; margin-bottom:5px; }
+    #btn-start { width:100%; max-width:440px; min-height:48px; margin:5px auto 0 !important; font-size:16px !important; border-radius:7px; }
+    #card-ai { background:#fafafa; }
+    #card-ai h3 { font-size:14px; }
+    #card-ai .hint { font-size:11px; }
+    .status-pills,.progress { max-width:440px; width:100%; }
+    header.hdr { position:relative; top:auto; z-index:5; padding:12px 14px 13px; background:#fff; border:0; border-bottom:1px solid #e3e5e7; box-shadow:none; }
+    .hdr-top { gap:12px; }
+    .avatar { width:62px; height:62px; flex:none; border-radius:7px; background:#f0f1f2; border:1px solid #dfe2e5; }
+    .avatar .ph { font-size:30px; }
+    .who .name { font-size:19px; font-weight:800; color:#242629; letter-spacing:-.35px; }
+    .who .sub { font-size:11px; color:#777c82; line-height:1.45; }
+    .who .money { font-size:15px; color:#219d50; font-weight:750; margin-top:2px; }
+    .ribbons { gap:5px; margin-top:8px; }
+    .ribbon { border-radius:4px; padding:2px 7px; font-size:10px; background:#eef8f1; color:#218d4b; border:1px solid #d9efdf; }
+    .bars { margin-top:11px; display:grid; grid-template-columns:1fr 1fr; gap:10px 14px; }
+    .bar-row { display:grid; grid-template-columns:17px minmax(0,1fr) 28px; gap:4px 5px; font-size:11px; }
+    .bar-row .lbl { width:auto; font-size:13px; }
+    .bar-row .bname { width:auto; color:#666c72; font-size:10px; font-weight:650; }
+    .bar-row .bval { width:auto; grid-column:3; grid-row:1; color:#777c82; font-size:10px; }
+    .bar-track { grid-column:2 / 4; grid-row:2; height:6px; border-radius:3px; background:#e9ebed; }
+    .bar-fill { border-radius:3px; }
+    main.feed { flex:1; min-height:180px; padding:12px 11px 18px; background:#f5f6f7; gap:0; }
+    .entry { position:relative; background:#fff; border:1px solid #e3e5e7; border-radius:7px; padding:11px 12px; margin-bottom:8px; box-shadow:none; }
+    .entry .meta { color:#92969b; font-size:10px; letter-spacing:.25px; font-weight:650; margin-bottom:4px; }
+    .entry .body { color:#292c30; font-size:13px; line-height:1.45; }
+    .entry.kind-event { border-left:3px solid #28aa59; }
+    .entry.kind-system { border-left:3px solid #cfd3d7; }
+    .entry.kind-llm,.entry.kind-help { border-left:3px solid #3987cf; }
+    .entry.kind-death { border-left:3px solid #d84a4a; }
+    .entry.kind-achievement { border-left:3px solid #e3a52d; background:#fffdf8; }
+    .entry img.scene { border-radius:6px; border:1px solid #e3e5e7; }
+    .bottom { position:sticky; bottom:0; z-index:8; padding:7px 8px max(8px,env(safe-area-inset-bottom)); background:#fff; border-top:1px solid #e0e3e6; box-shadow:0 -2px 8px rgba(0,0,0,.035); }
+    .input-row { display:none !important; }
+    .navbar { align-items:center; justify-content:space-between; gap:1px; }
+    .nav-item { min-height:52px; padding:5px 1px 2px; border-radius:6px; color:#777d83; gap:4px; }
+    .nav-item .ni-ic { font-size:20px; line-height:1; }
+    .nav-item .ni-lb { font-size:9px; letter-spacing:0; font-weight:650; }
+    .nav-item:hover:not(:disabled) { color:#209c50; background:#f4f8f5; }
+    .age-wrap { width:65px; flex:0 0 65px; align-items:center; }
+    .ageup { width:58px; height:48px; margin:0; border-radius:7px; border:0; background:#27ad5b; color:#fff; box-shadow:none; display:flex; flex-direction:column; gap:0; }
+    .ageup:hover:not(:disabled) { background:#219d50; }
+    .ageup:disabled { background:#b8c0ba; border:0; }
+    .ageup .ai { font-size:17px; }
+    .ageup .al { font-size:9px; }
+    .escape-btn { top:-8px; right:-4px; width:27px; height:27px; border:2px solid white; }
+    .navbar2 { gap:5px; margin-top:5px; padding-top:5px; border-top:1px solid #f0f1f2; }
+    .navbar2 button { border:0; background:transparent; color:#72777d; font-size:10px; padding:6px 2px; border-radius:5px; }
+    #modal-bg { background:rgba(22,26,30,.35); align-items:flex-end; }
+    .modal { width:100%; max-width:min(var(--ui-width,480px),100%); max-height:88dvh; padding:17px 14px max(22px,env(safe-area-inset-bottom)); border:0; border-radius:13px 13px 0 0; box-shadow:0 -5px 24px rgba(0,0,0,.12); }
+    .modal h2 { color:#25282c; font-size:19px; font-weight:800; margin-bottom:12px; }
+    .modal h2 .x { font-size:23px; }
+    .modal .sub-h { color:#279e53; font-size:11px; letter-spacing:.35px; margin:15px 0 7px; }
+    .opt { border:1px solid #e4e6e8; border-radius:7px; padding:10px; margin-bottom:6px; background:#fff; box-shadow:none; }
+    .opt .info .t { font-size:13px; color:#292c30; }
+    .opt .info .d { font-size:11px; color:#858a90; }
+    .choice-btn { border-radius:7px; padding:11px; margin-bottom:6px; background:#fff; border:1px solid #e2e5e7; }
+    .ach { border-radius:6px; border-color:#e2e5e7; }
+    .toast { border-radius:7px; background:#25282c; }
+    @media (max-width:360px) {
+      #overlay { padding-left:11px; padding-right:11px; }
+      .hdr-top { gap:9px; } .avatar { width:54px; height:54px; }
+      .bars { gap:8px 9px; } .nav-item .ni-ic { font-size:18px; }
+      .nav-item .ni-lb { font-size:8px; } .age-wrap { width:58px; flex-basis:58px; }
+      .ageup { width:53px; } .navbar2 button { font-size:9px; }
+    }
+    @media (orientation:landscape) and (max-height:520px) {
+      #overlay { padding-top:10px; } header.hdr { padding:7px 12px; }
+      .avatar { width:48px; height:48px; } .bars { margin-top:6px; gap:5px 12px; }
+      main.feed { padding-bottom:10px; } .bottom { padding-top:4px; } .nav-item { min-height:42px; }
+    }
+
   </style>
 </head>
 <body>
@@ -402,12 +493,12 @@
   <div class="app">
     <!-- ═══ Loading overlay / new-life picker ═══ -->
     <div id="overlay">
-      <h1>JMR's BitLife <span style="font-size:13px;color:var(--text-muted);font-weight:400;vertical-align:middle">v0.27.4</span></h1>
-      <div class="tagline">A life simulator that runs entirely in your browser. Pick your name, gender, country and seed, then live a life by clicking <b>Age Up</b> — the full game is premade and deterministic.<br/><br/>Optional AI (a local LLM for typed actions and Stable Diffusion art) is <b>off by default</b> and is not needed to play. You can switch it on under <span style="color:var(--accent)">AI Features</span> below — best on desktop with a recent GPU.</div>
+      <h1>New Life</h1>
+      <div class="tagline">Create your character, choose where their story begins, and make decisions as the years pass.</div>
 
       <div class="card sel" id="card-new" data-pick="new">
-        <h3>Start a New Life</h3>
-        <div class="hint">Born today. Choose details or randomize.</div>
+        <h3>Create Your Character</h3>
+        <div class="hint">Choose a name and personal details. Leave fields blank to randomize.</div>
         <div class="row">
           <div class="field"><label>First name</label><input id="nl-first" placeholder="(random)" /></div>
           <div class="field"><label>Surname</label><input id="nl-last" placeholder="(random)" /></div>
@@ -428,13 +519,13 @@
       </div>
 
       <div class="card" id="card-load" data-pick="load">
-        <h3>Load a Saved Life</h3>
-        <div class="hint">Resume a life saved in this browser.</div>
+        <h3>Continue a Life</h3>
+        <div class="hint">Pick up where you left off.</div>
         <div class="saved-list" id="saved-list"><em class="hint">No saved lives yet.</em></div>
       </div>
 
       <div class="card" id="card-ai" data-pick="ai">
-        <h3>AI Features <span style="font-size:12px;color:var(--text-muted);font-weight:400">— optional, off by default</span></h3>
+        <h3>Experimental Features <span style="font-size:12px;color:var(--text-muted);font-weight:400">— optional</span></h3>
         <div class="hint">The full game plays without any AI. Turn this on to type free-form actions (local Gemma LLM) and generate avatar &amp; scene art (local Stable Diffusion). These download large models and run on WebGPU — <b style="color:var(--warn)">heavy on phones; leave off if the game crashes, freezes, or runs hot on mobile.</b></div>
         <label style="display:flex;gap:8px;margin-top:12px;font-size:13px;align-items:flex-start;cursor:pointer">
           <input type="checkbox" id="enable-ai" style="width:auto;margin-top:3px" />
@@ -456,7 +547,7 @@
         </div>
       </div>
 
-      <button class="primary" id="btn-start" style="font-size:16px;padding:13px 30px;margin-top:6px">Start Life</button>
+      <button class="primary" id="btn-start" style="font-size:16px;padding:13px 30px;margin-top:6px">Start a New Life</button>
       <div class="progress" id="prog"><div class="fill" id="prog-fill"></div></div>
       <div id="load-status"></div>
       <div class="status-pills" id="status-pills">
