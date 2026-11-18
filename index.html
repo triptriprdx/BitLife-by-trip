@@ -308,6 +308,93 @@
 
     /* ── Full-screen mini-game host (Three.js etc.) ── */
     .mg-host { position: fixed; inset: 0; z-index: 120; background: #05060c; overflow: hidden; }
+
+    /* ── BitLife-inspired game presentation (keeps the existing JMR engine) ── */
+    body { background:#f3f4f6; color:#24262b; }
+    .app { max-width:480px; background:#f3f4f6; min-height:100dvh; }
+    header.hdr {
+      background:#fff; border:0; border-bottom:1px solid #dfe2e6;
+      padding:14px 15px 12px; box-shadow:none;
+    }
+    .hdr-top { align-items:center; gap:13px; }
+    .avatar {
+      width:66px; height:66px; border-radius:12px;
+      border:1px solid #d9dde2; background:#eef0f2;
+    }
+    .who .name { font-size:20px; color:#202328; font-weight:800; }
+    .who .sub { color:#737983; font-size:12px; line-height:1.45; }
+    .who .money { color:#229b55; font-size:16px; margin-top:3px; }
+    .ribbons { margin-top:9px; }
+    .ribbon { border-radius:4px; background:#edf8f1; border-color:#d2eddd; color:#258b50; }
+    .bars {
+      margin-top:13px; display:grid; grid-template-columns:1fr 1fr;
+      gap:9px 13px;
+    }
+    .bar-row { display:grid; grid-template-columns:19px minmax(0,1fr) 34px; gap:5px; font-size:11px; }
+    .bar-row .lbl { width:auto; font-size:13px; }
+    .bar-row .bname { width:auto; font-size:10px; color:#666d76; }
+    .bar-track { grid-column:2 / 4; grid-row:2; height:7px; background:#e7e9ec; border-radius:3px; }
+    .bar-row .bval { grid-column:3; grid-row:1; width:auto; font-size:10px; color:#606771; }
+    main.feed {
+      background:#f3f4f6; padding:12px 11px 115px; gap:0;
+    }
+    .entry {
+      background:#fff; border:1px solid #e1e4e8; border-radius:7px;
+      padding:12px 13px; margin-bottom:9px; box-shadow:none;
+    }
+    .entry .meta { color:#858b94; font-size:10px; letter-spacing:.25px; }
+    .entry .body { color:#292d33; font-size:14px; line-height:1.45; }
+    .entry.kind-event { border-left:3px solid #2eaa62; }
+    .entry.kind-system { border-left:3px solid #cbd0d6; }
+    .entry.kind-achievement { background:#fffdf5; border-color:#eee4bf; border-left:3px solid #e0ad36; }
+    .entry img.scene { max-width:100%; border-radius:5px; }
+    .bottom {
+      position:sticky; bottom:0; background:#fff; border-top:1px solid #dfe2e6;
+      padding:8px 8px calc(8px + env(safe-area-inset-bottom)); box-shadow:0 -2px 8px rgba(0,0,0,.04);
+    }
+    /* Free-text AI controls remain in the source and engine but stay out of the main game screen. */
+    .input-row { display:none; }
+    .navbar { align-items:center; gap:1px; }
+    .nav-item {
+      color:#656c75; border-radius:6px; padding:5px 1px 3px;
+      background:transparent; gap:4px;
+    }
+    .nav-item:hover:not(:disabled) { background:#f2f5f3; color:#269b58; }
+    .nav-item .ni-ic { font-size:21px; }
+    .nav-item .ni-lb { font-size:9px; font-weight:700; color:inherit; }
+    .age-wrap { width:78px; align-items:center; }
+    .ageup {
+      width:70px; height:48px; margin-top:-5px; border-radius:7px;
+      border:0; background:#2eaa62; box-shadow:0 2px 4px rgba(24,125,67,.2);
+      gap:0;
+    }
+    .ageup:hover:not(:disabled) { background:#258f52; }
+    .ageup .ai { font-size:19px; }
+    .ageup .al { font-size:10px; text-transform:none; letter-spacing:0; }
+    .ageup:disabled { background:#aeb7b1; border:0; }
+    .escape-btn { top:-13px; right:-8px; width:29px; height:29px; border-width:2px; }
+    .navbar2 { gap:4px; margin-top:6px; }
+    .navbar2 button {
+      border-radius:5px; background:#f4f5f6; border:1px solid #e4e6e9;
+      color:#535a63; font-size:10px; padding:6px 2px;
+    }
+    .dbg-toggle, #dbg, #dbg-copy { display:none !important; }
+    #modal-bg { background:rgba(24,29,35,.38); }
+    .modal {
+      border:0; border-radius:12px 12px 0 0; max-width:480px;
+      padding:17px 15px calc(24px + env(safe-area-inset-bottom));
+    }
+    .modal .opt { border-radius:6px; box-shadow:none; }
+    .modal .choice-btn { border-radius:6px; }
+    @media (max-width:360px) {
+      .hdr-top { gap:9px; }
+      .avatar { width:56px; height:56px; }
+      .bars { gap:8px 9px; }
+      .nav-item .ni-ic { font-size:19px; }
+      .nav-item .ni-lb { font-size:8px; }
+      .age-wrap { width:66px; }
+      .ageup { width:62px; }
+    }
   </style>
 </head>
 <body>
