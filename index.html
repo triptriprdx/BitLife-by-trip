@@ -80,6 +80,20 @@
     input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
     h1, h2, h3 { margin: 0 0 8px 0; }
     .app { width: 100%; max-width: 480px; min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
+    /* Optional appearance controls — original BitLife styling remains the default. */
+    body.ui-custom .app { max-width: min(var(--ui-width, 480px), 100%); }
+    body.ui-custom button { font-size: calc(14px * var(--ui-scale, 1)); padding: calc(9px * var(--ui-scale, 1)) calc(12px * var(--ui-scale, 1)); }
+    body.ui-custom input, body.ui-custom select, body.ui-custom textarea { font-size: calc(14px * var(--ui-scale, 1)); }
+    body.ui-compact .card { padding: 10px; }
+    body.ui-compact .opt { padding-top: 7px; padding-bottom: 7px; }
+    body[data-ui-theme="dark"] { --bg:#17191f; --panel:#22252e; --panel-alt:#2b2f3a; --border:#393e4b; --text:#f1f2f5; --text-muted:#a0a6b5; --accent:#2bb461; --accent-dim:#1f9c54; }
+    body[data-ui-theme="pink"] { --accent:#ed5b9b; --accent-dim:#d94787; --health:#34c275; }
+    body[data-ui-theme="purple"] { --accent:#9870e8; --accent-dim:#8057d0; }
+    body[data-ui-theme="blue"] { --accent:#438de0; --accent-dim:#3077c6; }
+    .appearance-setting { margin: 12px 0; }
+    .appearance-setting label { display:flex; justify-content:space-between; gap:12px; font-weight:600; margin-bottom:6px; }
+    .appearance-setting input[type="range"] { padding:0; accent-color:var(--accent); }
+    .appearance-setting select { margin-top:2px; }
 
     /* ── Loading overlay / picker ── */
     #overlay {
@@ -4835,14 +4849,64 @@ Freeform effects are DELTAS only, each stat -15..15, money realistic. Output val
     const html = `<div class="opt"><div class="info"><div class="t">Save this life</div><div class="d">Auto-saves every action; this forces a save.</div></div><button id="m-save">Save</button></div>
       <div class="opt"><div class="info"><div class="t">New life</div><div class="d">Abandon this life and start fresh.</div></div><button id="m-new">New</button></div>
       <div class="opt"><div class="info"><div class="t">God Mode ✨</div><div class="d">Edit your stats / money (sandbox).</div></div><button id="m-god">Open</button></div>
+      <div class="opt"><div class="info"><div class="t">Appearance</div><div class="d">Customize width, colors, text and spacing.</div></div><button id="m-appearance">Customize</button></div>
       <div class="opt"><div class="info"><div class="t">Time Machine ⏪</div><div class="d">Rewind to the start of last year (undo one Age Up).</div></div><button id="m-time">Rewind</button></div>
       <div class="opt"><div class="info"><div class="t">Seed</div><div class="d">${game.seed} (same seed reproduces this life)${game.generation ? " · generation " + game.generation : ""}</div></div></div>`;
     modalShell("☰ Menu", html);
     $("m-save").onclick = () => { autosave(); showToast("Saved."); closeModal(); };
+    $("m-appearance").onclick = () => openAppearanceSettings();
     $("m-new").onclick = () => { if (confirm("Abandon this life and start a new one?")) location.reload(); };
     $("m-time").onclick = () => timeMachine();
     $("m-god").onclick = () => openGodMode();
   }
+
+  // Appearance preferences are cosmetic only and stored separately from life saves.
+  const UI_PREF_KEY = "bitlife_ui_preferences";
+  const UI_DEFAULTS = { theme: "classic", width: 480, scale: 1, density: "normal" };
+  function readUiPrefs() {
+    try { return { ...UI_DEFAULTS, ...(JSON.parse(localStorage.getItem(UI_PREF_KEY) || "{}")) }; }
+    catch { return { ...UI_DEFAULTS }; }
+  }
+  let uiPrefs = readUiPrefs();
+  function applyUiPrefs() {
+    const p = uiPrefs;
+    document.body.classList.add("ui-custom");
+    document.body.classList.toggle("ui-compact", p.density === "compact");
+    document.body.dataset.uiTheme = p.theme === "classic" ? "" : p.theme;
+    document.documentElement.style.setProperty("--ui-width", Math.max(320, Math.min(1200, Number(p.width) || 480)) + "px");
+    document.documentElement.style.setProperty("--ui-scale", Math.max(.85, Math.min(1.2, Number(p.scale) || 1)));
+  }
+  function saveUiPrefs() {
+    try { localStorage.setItem(UI_PREF_KEY, JSON.stringify(uiPrefs)); } catch {}
+    applyUiPrefs();
+  }
+  function openAppearanceSettings() {
+    const html = `
+      <div class="hint" style="margin-bottom:12px">Keep the classic BitLife look, but adjust how it fits your screen.</div>
+      <div class="appearance-setting"><label for="ui-theme">Color theme</label><select id="ui-theme">
+        <option value="classic">Classic BitLife</option><option value="dark">Dark</option>
+        <option value="pink">Pink accent</option><option value="purple">Purple accent</option><option value="blue">Blue accent</option>
+      </select></div>
+      <div class="appearance-setting"><label for="ui-width"><span>Game width</span><span id="ui-width-value"></span></label>
+        <input id="ui-width" type="range" min="360" max="1200" step="20"></div>
+      <div class="appearance-setting"><label for="ui-scale"><span>Interface scale</span><span id="ui-scale-value"></span></label>
+        <input id="ui-scale" type="range" min="0.85" max="1.2" step="0.05"></div>
+      <div class="appearance-setting"><label for="ui-density">Layout spacing</label><select id="ui-density">
+        <option value="normal">Classic</option><option value="compact">Compact</option>
+      </select></div>
+      <div class="row" style="margin-top:14px"><button id="ui-reset">Reset defaults</button><button class="primary" id="ui-done">Done</button></div>`;
+    modalShell("Appearance", html);
+    const theme=$("ui-theme"), width=$("ui-width"), scale=$("ui-scale"), density=$("ui-density");
+    const widthValue=$("ui-width-value"), scaleValue=$("ui-scale-value");
+    theme.value=uiPrefs.theme; width.value=uiPrefs.width; scale.value=uiPrefs.scale; density.value=uiPrefs.density;
+    const update=()=>{ widthValue.textContent=width.value+" px"; scaleValue.textContent=Math.round(Number(scale.value)*100)+"%"; };
+    const change=()=>{ uiPrefs={theme:theme.value,width:Number(width.value),scale:Number(scale.value),density:density.value}; update(); saveUiPrefs(); };
+    theme.onchange=()=>{change();}; width.oninput=()=>{change();}; scale.oninput=()=>{change();}; density.onchange=()=>{change();};
+    $("ui-reset").onclick=()=>{ uiPrefs={...UI_DEFAULTS}; theme.value=uiPrefs.theme; width.value=uiPrefs.width; scale.value=uiPrefs.scale; density.value=uiPrefs.density; update(); saveUiPrefs(); };
+    $("ui-done").onclick=()=>closeModal();
+    update();
+  }
+  applyUiPrefs();
 
   function openChoicePopup(ev) {
     const choices = Array.isArray(ev && ev.choices) ? ev.choices : [];
